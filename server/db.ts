@@ -1,6 +1,14 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import {
+  InsertUser,
+  users,
+  clients,
+  equipment,
+  serviceOrders,
+  statusHistory,
+  InsertStatusHistory,
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +97,84 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Feature queries
+
+export async function getServiceOrders(filters?: {
+  status?: string;
+  clientId?: number;
+  equipmentId?: number;
+}): Promise<any[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query: any = db.select().from(serviceOrders);
+  
+  if (filters?.status) {
+    query = query.where(eq(serviceOrders.status, filters.status as any));
+  }
+  if (filters?.clientId) {
+    query = query.where(eq(serviceOrders.clientId, filters.clientId));
+  }
+  if (filters?.equipmentId) {
+    query = query.where(eq(serviceOrders.equipmentId, filters.equipmentId));
+  }
+
+  return await query;
+}
+
+export async function getClients(): Promise<any[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(clients);
+}
+
+export async function getEquipment(clientId?: number): Promise<any[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  let query: any = db.select().from(equipment);
+  if (clientId) {
+    query = query.where(eq(equipment.clientId, clientId));
+  }
+  return await query;
+}
+
+export async function getClientById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(clients).where(eq(clients.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getEquipmentById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(equipment).where(eq(equipment.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getServiceOrderById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(serviceOrders).where(eq(serviceOrders.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getStatusHistory(serviceOrderId: number): Promise<any[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(statusHistory).where(eq(statusHistory.serviceOrderId, serviceOrderId));
+}
+
+export async function createStatusHistoryEntry(data: InsertStatusHistory) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.insert(statusHistory).values(data);
+  return result;
+}
+
+export async function updateServiceOrderStatus(id: number, status: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  return db.update(serviceOrders).set({ status: status as any }).where(eq(serviceOrders.id, id));
+}
