@@ -20,16 +20,16 @@
 - [ ] Destaques visuais (vermelho) para vencimentos
 
 ### Clientes
-- [ ] Listar clientes
-- [ ] Criar cliente
-- [ ] Editar cliente
+- [x] Listar clientes
+- [x] Criar cliente
+- [x] Editar cliente (estrutura pronta)
 - [ ] Visualizar detalhes do cliente
 - [ ] Busca case-insensitive
 
 ### Equipamentos
-- [ ] Listar equipamentos
-- [ ] Criar equipamento
-- [ ] Editar equipamento
+- [x] Listar equipamentos
+- [x] Criar equipamento
+- [x] Editar equipamento (estrutura pronta)
 - [ ] Visualizar detalhes do equipamento
 
 ### Funcionalidades Avançadas
